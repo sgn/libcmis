@@ -106,3 +106,14 @@
 0.6.2
 
   * fix up version-info
+
+0.6.3
+
+  * More robust handling of server responses: added bounds and
+    missing-value checks across the XML, SOAP, JSON, multipart and
+    base64 parsing paths
+  * Reject stray control characters in URLs, headers, credentials and
+    proxy settings, and bound the size and duration of a response
+  * Run curl_global_init once via std::call_once
+  * Build fixes for boost 1.86, libxml2 2.12 and clang
+  * Switched continuous integration to GitHub Actions

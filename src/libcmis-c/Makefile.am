@@ -29,7 +29,12 @@ libcmis_c_@LIBCMIS_API_VERSION@_la_SOURCES = \
 	session.cxx \
 	vectors.cxx
 
-libcmis_c_@LIBCMIS_API_VERSION@_la_LDFLAGS = -export-dynamic -no-undefined -version-info 6:0:0
+# libtool version-info: current:revision:age
+#  - source changed, no API change:          r += 1
+#  - public API added:                       c += 1; r = 0; a += 1
+#  - public API removed or signature change: c += 1; r = 0; a = 0
+# Linux SONAME suffix is (current - age).
+libcmis_c_@LIBCMIS_API_VERSION@_la_LDFLAGS = -export-dynamic -no-undefined -version-info 6:1:0
 
 libcmis_c_@LIBCMIS_API_VERSION@_la_LIBADD = \
 	../libcmis/libcmis-@LIBCMIS_API_VERSION@.la \

@@ -132,11 +132,12 @@ libcmis_la_SOURCES = \
 	ws-versioningservice.hxx \
 	xml-utils.cxx
 
-# -version-info current:revision:age see https://autotools.info/libtool/version.html
-# Always increase the revision value.
-# Increase the current value whenever an interface has been added, removed or changed.
-# Increase the age value only if the changes made to the ABI are backward compatible.
-libcmis_@LIBCMIS_API_VERSION@_la_LDFLAGS = -export-dynamic -no-undefined -version-info 7:1:1
+# libtool version-info: current:revision:age
+#  - source changed, no API change:          r += 1
+#  - public API added:                       c += 1; r = 0; a += 1
+#  - public API removed or signature change: c += 1; r = 0; a = 0
+# Linux SONAME suffix is (current - age).
+libcmis_@LIBCMIS_API_VERSION@_la_LDFLAGS = -export-dynamic -no-undefined -version-info 7:2:1
 
 libcmis_@LIBCMIS_API_VERSION@_la_LIBADD = \
 	libcmis.la \
