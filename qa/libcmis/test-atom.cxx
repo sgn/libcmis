@@ -66,6 +66,7 @@ class AtomTest : public CppUnit::TestFixture
         void sessionCreationTest( );
         void sessionCreationBadAuthTest( );
         void sessionCreationProxyTest( );
+        void setProxySettingsCRLFInjectionTest( );
         void authCallbackTest( );
         void invalidSSLTest( );
         void getRepositoriesTest( );
@@ -105,6 +106,7 @@ class AtomTest : public CppUnit::TestFixture
         CPPUNIT_TEST( sessionCreationTest );
         CPPUNIT_TEST( sessionCreationBadAuthTest );
         CPPUNIT_TEST( sessionCreationProxyTest );
+        CPPUNIT_TEST( setProxySettingsCRLFInjectionTest );
         CPPUNIT_TEST( authCallbackTest );
         CPPUNIT_TEST( invalidSSLTest );
         CPPUNIT_TEST( getRepositoriesTest );
@@ -254,6 +256,28 @@ void AtomTest::sessionCreationProxyTest( )
     CPPUNIT_ASSERT_EQUAL_MESSAGE( "NoProxy not set", noProxy, string( curl_mockup_getNoProxy( session.m_curlHandle ) ) );
     CPPUNIT_ASSERT_EQUAL_MESSAGE( "Proxy User not set", proxyUser, string( curl_mockup_getProxyUser( session.m_curlHandle ) ) );
     CPPUNIT_ASSERT_EQUAL_MESSAGE( "Proxy Pass not set", proxyPass, string( curl_mockup_getProxyPass( session.m_curlHandle ) ) );
+
+    // Reset proxy settings to default for next tests
+    libcmis::SessionFactory::setProxySettings( string(), string(), string(), string() );
+}
+
+void AtomTest::setProxySettingsCRLFInjectionTest( )
+{
+    // A CR or LF in any proxy field must be rejected before it reaches
+    // the CURLOPT_PROXY* options.
+    CPPUNIT_ASSERT_THROW_MESSAGE( "CRLF in proxy URL not rejected",
+        libcmis::SessionFactory::setProxySettings(
+            "http://proxy\r\n:3128", string(), string(), string() ),
+        libcmis::Exception );
+    CPPUNIT_ASSERT_THROW_MESSAGE( "CRLF in proxy username not rejected",
+        libcmis::SessionFactory::setProxySettings(
+            string(), string(), "user\r\nname", string() ),
+        libcmis::Exception );
+
+    // A clean configuration must still go through untouched.
+    CPPUNIT_ASSERT_NO_THROW(
+        libcmis::SessionFactory::setProxySettings(
+            "http://proxy:3128", "localhost", "u", "p" ) );
 
     // Reset proxy settings to default for next tests
     libcmis::SessionFactory::setProxySettings( string(), string(), string(), string() );

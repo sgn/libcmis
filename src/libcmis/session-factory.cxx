@@ -57,6 +57,14 @@ namespace libcmis
     void SessionFactory::setProxySettings( string proxy, string noProxy,
             string proxyUser, string proxyPass )
     {
+        // Reject CR, LF and NUL before these reach CURLOPT_PROXY,
+        // CURLOPT_NOPROXY, CURLOPT_PROXYUSERNAME and CURLOPT_PROXYPASSWORD,
+        // matching the request-side.
+        libcmis::rejectControlChars( proxy, "proxy" );
+        libcmis::rejectControlChars( noProxy, "noProxy" );
+        libcmis::rejectControlChars( proxyUser, "proxy username" );
+        libcmis::rejectControlChars( proxyPass, "proxy password" );
+
         SessionFactory::s_proxy = proxy;
         SessionFactory::s_noProxy = noProxy;
         SessionFactory::s_proxyUser = proxyUser;
