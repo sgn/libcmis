@@ -30,6 +30,7 @@
 
 #include <cctype>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <assert.h>
 
@@ -46,6 +47,12 @@ using namespace std;
 
 namespace
 {
+    void ensureCurlGlobalInit( )
+    {
+        static std::once_flag onceFlag;
+        std::call_once( onceFlag, [ ]( ) { curl_global_init( CURL_GLOBAL_ALL ); } );
+    }
+
     size_t lcl_getHeaders( void *ptr, size_t size, size_t nmemb, void *userdata )
     {
         libcmis::HttpResponse* response = static_cast< libcmis::HttpResponse* >( userdata );
@@ -194,7 +201,7 @@ HttpSession::HttpSession( string username, string password, bool noSslCheck,
     m_inOAuth2Authentication( false ),
     m_authMethod( CURLAUTH_ANY )
 {
-    curl_global_init( CURL_GLOBAL_ALL );
+    ensureCurlGlobalInit( );
     m_curlHandle = curl_easy_init( );
 
     if ( oauth2 && oauth2->isComplete( ) ){
@@ -220,7 +227,7 @@ HttpSession::HttpSession( const HttpSession& copy ) :
     m_authMethod( copy.m_authMethod )
 {
     // Not sure how sharing curl handles is safe.
-    curl_global_init( CURL_GLOBAL_ALL );
+    ensureCurlGlobalInit( );
     m_curlHandle = curl_easy_init( );
 }
 
@@ -238,7 +245,7 @@ HttpSession::HttpSession( ) :
     m_inOAuth2Authentication( false ),
     m_authMethod( CURLAUTH_ANY )
 {
-    curl_global_init( CURL_GLOBAL_ALL );
+    ensureCurlGlobalInit( );
     m_curlHandle = curl_easy_init( );
 }
 
@@ -264,7 +271,7 @@ HttpSession& HttpSession::operator=( const HttpSession& copy )
         m_authMethod = copy.m_authMethod;
 
         // Not sure how sharing curl handles is safe.
-        curl_global_init( CURL_GLOBAL_ALL );
+        ensureCurlGlobalInit( );
         m_curlHandle = curl_easy_init( );
     }
 
