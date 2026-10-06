@@ -24,7 +24,7 @@ AC_PROG_LIBTOOL
 LT_INIT([win32-dll disable-static pic-only])
 AC_CANONICAL_HOST
 
-AX_CXX_COMPILE_STDCXX_11
+AX_CXX_COMPILE_STDCXX_14
 
 # Check the options
 AC_ARG_ENABLE(client,
